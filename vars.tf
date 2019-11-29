@@ -16,7 +16,7 @@ variable "ami_id" {
  
 variable "instance_type" {
     description = "AWS Instance type to be used for the WordPress instance"
-    default = "t2.small"
+    default = "t2.micro"
 }
  
 variable "volume_size" {
