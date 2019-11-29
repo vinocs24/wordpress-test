@@ -55,7 +55,7 @@ resource "aws_efs_file_system" "efsWordPress" {
 }
  
 data "aws_subnet_ids" "suballIDs" {
-    vpc_id = var.vpc_id
+    vpc_id = data.aws_vpc.suballIDs.id
 }
  
 resource "aws_efs_mount_target" "mtWordPress" {
