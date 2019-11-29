@@ -5,7 +5,7 @@ variable "region" {
      
 variable "vpc_id" {
     description = "The VPC ID where WordPress will reside"
-    default = "vpc-281b194f"  
+    default = "vpc-04841a8f0654f9cc6"  
 }
  
 variable "ami_id" {
