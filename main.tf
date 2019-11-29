@@ -1,35 +1,35 @@
 provider "aws" {
-    region = "${var.region}"
+    region = var.region
 }
  
 resource "aws_security_group" "sgWordPress" {
     name = "sgWordPress"
-    vpc_id      = "${var.vpc_id}"
+    vpc_id      = var.vpc_id
  
     ingress {
-        from_port = "${var.ssh_port}"
-        to_port = "${var.ssh_port}"
+        from_port = var.ssh_port
+        to_port = var.ssh_port
         protocol = "tcp"
         cidr_blocks =["0.0.0.0/0"]
     }
  
     ingress {
-        from_port = "${var.http_port}"
-        to_port = "${var.http_port}"
+        from_port = var.http_port
+        to_port = var.http_port
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
  
     ingress {
-        from_port = "${var.mysql_port}"
-        to_port = "${var.mysql_port}"
+        from_port = var.mysql_port
+        to_port = var.mysql_port
         protocol = "tcp"
         self = true
     }
  
     ingress {
-        from_port = "${var.nfs_port}"
-        to_port = "${var.nfs_port}"
+        from_port = var.nfs_port
+        to_port = var.nfs_port
         protocol = "tcp"
         self = true
     }
@@ -41,7 +41,7 @@ resource "aws_security_group" "sgWordPress" {
         cidr_blocks = ["0.0.0.0/0"]
     }
  
-    tags {
+    tags = {
         Name = "sgWordPress"
     }
 }
@@ -49,34 +49,34 @@ resource "aws_security_group" "sgWordPress" {
 resource "aws_efs_file_system" "efsWordPress" {
   creation_token = "EFS for WordPress"
  
-  tags {
+  tags = {
     Name = "EFS for WordPress"
   }
 }
  
 data "aws_subnet_ids" "suballIDs" {
-    vpc_id = "${var.vpc_id}"
+    vpc_id = var.vpc_id
 }
  
 resource "aws_efs_mount_target" "mtWordPress" {
-  count = "${length(data.aws_subnet_ids.suballIDs.ids)}"
-  file_system_id = "${aws_efs_file_system.efsWordPress.id}"
-  subnet_id      = "${element(data.aws_subnet_ids.suballIDs.ids, count.index)}"
-  security_groups = ["${aws_security_group.sgWordPress.id}"]
+  count = length(data.aws_subnet_ids.suballIDs.ids)
+  file_system_id = aws_efs_file_system.efsWordPress.id
+  subnet_id      = element(data.aws_subnet_ids.suballIDs.ids, count.index)
+  security_groups = [aws_security_group.sgWordPress.id]
 }
  
 resource "aws_instance" "wordpress" {
-    ami = "${var.ami_id}"
-    instance_type = "${var.instance_type}"
-    vpc_security_group_ids = ["${aws_security_group.sgWordPress.id}"]
-    key_name = "${var.key_name}"
+    ami = var.ami_id
+    instance_type = var.instance_type
+    vpc_security_group_ids = [aws_security_group.sgWordPress.id]
+    key_name = var.key_name
     ebs_block_device {
         device_name = "/dev/sdb"
-        volume_size = "${var.volume_size}"
+        volume_size = var.volume_size
         delete_on_termination = "true"
     }
  
-    tags {
+    tags = {
         Name = "WordPress Server"
     }
  
@@ -113,15 +113,15 @@ resource "aws_db_instance" "dbWordPress" {
     identifier = "dbwordpress"
     engine = "mysql"
     engine_version = "5.7"
-    allocated_storage = "${var.allocated_storage}"
-    instance_class = "${var.instance_class}"
-    vpc_security_group_ids = ["${aws_security_group.sgWordPress.id}"]
-    name = "${var.db_name}"
-    username = "${var.db_admin}"
-    password = "${var.db_password}"
+    allocated_storage = var.allocated_storage
+    instance_class = var.instance_class
+    vpc_security_group_ids = [aws_security_group.sgWordPress.id]
+    name = var.db_name
+    username = var.db_admin
+    password = var.db_password
     parameter_group_name = "default.mysql5.7"
     skip_final_snapshot = true
-    tags {
+    tags = {
         Name = "WordPress DB"
     }
 }
