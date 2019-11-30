@@ -55,17 +55,20 @@ resource "aws_efs_file_system" "efsWordPress" {
 }
  
 data "aws_subnet_ids" "destination" {                              
-  vpc_id = [aws_vpc.destination.id]                             
+  vpc_id = data.aws_vpc.destination.id                             
   tags   = {                                                       
     SUB-Type = "Public"                                            
   }                                                                   
 }                                                                  
-                                                                  
+                                                                   
+data "aws_subnet" "destination" {                                  
+  count = length(data.aws_subnet_ids.destination.ids)              
+  subnet_id = element(data.aws_subnet_ids.destination.ids, count.index)
+}
+
 resource "aws_efs_mount_target" "mtWordPress" {
-    count = length(data.aws_subnet_ids.destination.ids)
-    file_system_id = aws_efs_file_system.efsWordPress.id
-    subnet_id = element(data.aws_subnet_ids.destination.ids, count.index)
-    security_groups = [aws_security_group.sgWordPress.id]
+  file_system_id = aws_efs_file_system.efsWordPress.id
+  security_groups = [aws_security_group.sgWordPress.id]
 }
  
 resource "aws_instance" "wordpress" {
