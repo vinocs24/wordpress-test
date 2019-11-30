@@ -54,16 +54,6 @@ resource "aws_efs_file_system" "efsWordPress" {
   }
 }
  
-data "aws_subnet_ids" "suballIDs" {
-    vpc_id = var.vpc_id
-}
- 
-resource "aws_efs_mount_target" "mtWordPress" {
-  count = length(data.aws_subnet_ids.suballIDs.ids)
-  file_system_id = aws_efs_file_system.efsWordPress.id
-  subnet_id      = element(data.aws_subnet_ids.suballIDs.ids, count.index)
-  security_groups = [aws_security_group.sgWordPress.id]
-}
  
 resource "aws_instance" "wordpress" {
     ami = var.ami_id
