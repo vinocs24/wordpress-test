@@ -55,7 +55,7 @@ resource "aws_efs_file_system" "efsWordPress" {
 }
  
 data "aws_subnet_ids" "destination" {                              
-  vpc_id = aws_vpc.destination.id                             
+  vpc_id = [aws_vpc.destination.id]                             
   tags   = {                                                       
     SUB-Type = "Public"                                            
   }                                                                   
